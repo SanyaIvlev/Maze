@@ -1,3 +1,11 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using MazeClass;
 
-Console.WriteLine("Hello, World!");
+static class Program
+{
+    static void Main(string[] args)
+    {
+        Maze maze = new Maze();
+        maze.GenerateMap();
+        maze.DrawMap();
+    } 
+}
