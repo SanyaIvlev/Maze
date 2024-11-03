@@ -4,8 +4,8 @@ public class Maze
 {
     public int dx = 0, dy = 0;
     
-    static private int width = 10;
-    static private int height = 10;
+    private static int width = 10;
+    private static int height = 10;
     private char[,] field = new char[height,width];
 
     private int blockFrequency = 28;
@@ -98,10 +98,12 @@ public class Maze
             isReachedFinish = true;
         }
     }
+    
     private bool IsWalkable(int x, int y)
     {
         return field[x, y] != '#';
     }
+    
     private bool CanGoTo(int x, int y)
     {
         if (x < 0 || y < 0 || x >= width || y >= height)
