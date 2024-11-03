@@ -2,6 +2,8 @@ namespace MazeClass;
 
 public class Maze
 {
+    public int dx = 0, dy = 0;
+    
     static private int width = 10;
     static private int height = 10;
     private char[,] field = new char[height,width];
@@ -9,8 +11,11 @@ public class Maze
     private int blockFrequency = 28;
 
     private char dog = '@';
-    private int dogX = 0;
-    private int dogY = 0;
+    private int dogX, dogY;
+
+    private int finishX, finishY;
+
+    private bool isReachedFinish = false;
     
     private Random random = new Random();
 
@@ -20,7 +25,106 @@ public class Maze
         GenerateField();
         PlaceDog();
     }
+    
+    public void DrawMap()
+    {
+        Console.Clear();
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                char symbol = field[i, j];
+                
+                if (i == dogY && j == dogX)
+                {
+                    symbol = dog;
+                }
+                Console.Write(symbol);
+            }
+            Console.WriteLine();
+        }
+    }
+    
+    public (int, int) GetInput()
+    {
+        int dx = 0, dy = 0;
+        
+        string input = Console.ReadLine();
+        
+        if (input.Length == 0)
+        {
+            return (0,0);
+        }
 
+        char firstSymbol = input[0];
+
+        if (firstSymbol == 'W' || firstSymbol == 'w')
+        {
+            dy = -1;
+        }
+        else if (firstSymbol == 'A' || firstSymbol == 'a')
+        {
+            dx = -1;
+        }
+        else if (firstSymbol == 'S' || firstSymbol == 's')
+        {
+            dy = 1;
+        }
+        else if (firstSymbol == 'D' || firstSymbol == 'd')
+        {
+            dx = 1;
+        }
+
+        return (dx, dy);
+    }
+
+    public bool IsGameEnded()
+    {
+        return isReachedFinish;
+    }
+
+    private void TryGoTo(int x, int y)
+    {
+        if (CanGoTo(x, y))
+        {
+            GoTo(x, y);
+        }
+    }
+
+    private void CheckFinish()
+    {
+        if (dogX == finishX && dogY == finishY)
+        {
+            isReachedFinish = true;
+        }
+    }
+    private bool IsWalkable(int x, int y)
+    {
+        return field[x, y] != '#';
+    }
+    private bool CanGoTo(int x, int y)
+    {
+        if (x < 0 || y < 0 || x >= width || y >= height)
+        {
+            return false;
+        }
+
+        return IsWalkable(x, y);
+    }
+
+    private void GoTo(int x, int y)
+    {
+        dogX = x;
+        dogY = y;
+    }
+    
+    public void Logic()
+    {
+        TryGoTo(dogX + dx, dogY + dy);
+        
+        CheckFinish();
+    }
+    
     private void PlaceDog()
     {
         dogX = random.Next(0, width);
@@ -43,23 +147,15 @@ public class Maze
                 field[i, j] = symbol;
             }
         }
+
+        finishX = random.Next(0, width);
+        finishY = random.Next(0, height);
+
+        field[finishY,finishX] = 'F';
     }
 
-    public void DrawMap()
-    {
-        for (int i = 0; i < height; i++)
-        {
-            for (int j = 0; j < width; j++)
-            {
-                char symbol = field[i, j];
-                
-                if (i == dogX && j == dogY)
-                {
-                    symbol = dog;
-                }
-                Console.Write(symbol);
-            }
-            Console.WriteLine();
-        }
-    }
+    
+    
+    
+    
 }

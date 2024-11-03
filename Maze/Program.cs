@@ -7,5 +7,14 @@ static class Program
         Maze maze = new Maze();
         maze.GenerateMap();
         maze.DrawMap();
+
+        while (!maze.IsGameEnded())
+        {
+            (maze.dx, maze.dy) = maze.GetInput();
+            maze.Logic();
+            maze.DrawMap();
+        }
+        
+        Console.WriteLine("You have finished!");
     } 
 }
