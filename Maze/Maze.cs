@@ -20,6 +20,21 @@ public class Maze
     private Random random = new Random();
 
 
+    public void RunGame()
+    {
+        GenerateField();
+        DrawMap();
+
+        while (!IsGameEnded())
+        {
+            (dx,dy) = GetInput();
+            Logic();
+            DrawMap();
+        }
+        
+        Console.WriteLine("You have finished!");
+    }
+    
     public void GenerateMap()
     {
         GenerateField();
@@ -45,8 +60,9 @@ public class Maze
         }
     }
     
-    public (int, int) GetInput()
+    public (int,int) GetInput()
     {
+        //(dx, dy) = (0, 0);
         int dx = 0, dy = 0;
         
         string input = Console.ReadLine();
@@ -76,6 +92,7 @@ public class Maze
         }
 
         return (dx, dy);
+
     }
 
     public bool IsGameEnded()
@@ -101,7 +118,7 @@ public class Maze
     
     private bool IsWalkable(int x, int y)
     {
-        return field[x, y] != '#';
+        return field[y, x] != '#';
     }
     
     private bool CanGoTo(int x, int y)
@@ -110,8 +127,11 @@ public class Maze
         {
             return false;
         }
-
-        return IsWalkable(x, y);
+        else if (!IsWalkable(x, y))
+        {
+            return false;
+        }
+        return true;
     }
 
     private void GoTo(int x, int y)
