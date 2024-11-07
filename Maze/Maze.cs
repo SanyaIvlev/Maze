@@ -14,6 +14,10 @@ public class Maze
     private int dogX, dogY;
 
     private int finishX, finishY;
+    private int jetpackX, jetpackY;
+    private char jetpack = 'J';
+
+    private bool hasJetpack = false;
 
     private bool isReachedFinish = false;
     
@@ -100,19 +104,20 @@ public class Maze
         return isReachedFinish;
     }
 
-    private void TryGoTo(int x, int y)
-    {
-        if (CanGoTo(x, y))
-        {
-            GoTo(x, y);
-        }
-    }
-
     private void CheckFinish()
     {
         if (dogX == finishX && dogY == finishY)
         {
             isReachedFinish = true;
+        }
+    }
+
+    private void CheckJetpack()
+    {
+        if (dogX == jetpackX && dogY == jetpackY)
+        {
+            hasJetpack = true;
+            field[jetpackY, jetpackX] = '.';
         }
     }
     
@@ -121,7 +126,15 @@ public class Maze
         return field[y, x] != '#';
     }
     
-    private bool CanGoTo(int x, int y)
+    private void TryGoTo(int x, int y)
+    {
+        if (CanGoTo(ref x, ref y))
+        {
+            GoTo(x, y);
+        }
+    }
+    
+    private bool CanGoTo(ref int x, ref int y)
     {
         if (x < 0 || y < 0 || x >= width || y >= height)
         {
@@ -129,6 +142,13 @@ public class Maze
         }
         else if (!IsWalkable(x, y))
         {
+            if (hasJetpack)
+            {
+                x += dx;
+                y += dy;
+                hasJetpack = false;
+                return true;
+            }
             return false;
         }
         return true;
@@ -142,6 +162,8 @@ public class Maze
     
     public void Logic()
     {
+        CheckJetpack();
+        
         TryGoTo(dogX + dx, dogY + dy);
         
         CheckFinish();
@@ -149,8 +171,19 @@ public class Maze
     
     private void PlaceDog()
     {
-        dogX = random.Next(0, width);
-        dogY = random.Next(0, height);
+        (dogX, dogY) = GetRandomPosition();
+    }
+
+    private void PlaceJetpack()
+    {
+        (jetpackX, jetpackY) = GetRandomPosition();
+        field[jetpackY, jetpackX] = jetpack;
+    }
+
+    private void PlaceFinish()
+    {
+        (finishX, finishY) = GetRandomPosition();
+        field[finishY, finishX] = 'F';
     }
 
     private void GenerateField()
@@ -169,11 +202,17 @@ public class Maze
                 field[i, j] = symbol;
             }
         }
+        
+        PlaceJetpack();
+        PlaceFinish();
+    }
 
-        finishX = random.Next(0, width);
-        finishY = random.Next(0, height);
-
-        field[finishY,finishX] = 'F';
+    private (int x, int y) GetRandomPosition()
+    {
+        int x = random.Next(0, width);
+        int y = random.Next(0, height);
+        
+        return (x, y);
     }
 
     
