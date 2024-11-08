@@ -126,15 +126,18 @@ public class Maze
         return field[y, x] != '#';
     }
     
-    private void TryGoTo(int x, int y)
+    private bool TryGoTo(int x, int y)
     {
-        if (CanGoTo(ref x, ref y))
+        if (CanGoTo(x, y))
         {
             GoTo(x, y);
+            return true;
         }
+
+        return false;
     }
     
-    private bool CanGoTo(ref int x, ref int y)
+    private bool CanGoTo(int x, int y)
     {
         if (x < 0 || y < 0 || x >= width || y >= height)
         {
@@ -144,16 +147,19 @@ public class Maze
         {
             if (hasJetpack)
             {
-                x += dx;
-                y += dy;
-                hasJetpack = false;
-                return true;
+                TryJumpOver(x, y);
             }
             return false;
         }
         return true;
     }
 
+    private void TryJumpOver(int x, int y)
+    {
+        bool hasMoved = TryGoTo(x + dx, y + dy);
+        hasJetpack = !hasMoved;
+    }
+    
     private void GoTo(int x, int y)
     {
         dogX = x;
