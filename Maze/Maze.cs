@@ -13,13 +13,15 @@ public class Maze
     private char dog = '@';
     private int dogX, dogY;
 
-    private int finishX, finishY;
+    private int finishX, finishY; 
     private int jetpackX, jetpackY;
     private char jetpack = 'J';
 
     private bool hasJetpack = false;
 
     private bool isReachedFinish = false;
+
+    private int oxygenLeft = 30;
     
     private Random random = new Random();
 
@@ -31,12 +33,12 @@ public class Maze
 
         while (!IsGameEnded())
         {
-            (dx,dy) = GetInput();
+            GetInput();
             Logic();
             DrawMap();
         }
         
-        Console.WriteLine("You have finished!");
+        Console.WriteLine("Game ended!");
     }
     
     public void GenerateMap()
@@ -62,46 +64,35 @@ public class Maze
             }
             Console.WriteLine();
         }
+        Console.WriteLine("\nOxygen left: " + oxygenLeft);
     }
     
-    public (int,int) GetInput()
+    public void GetInput()
     {
-        //(dx, dy) = (0, 0);
-        int dx = 0, dy = 0;
         
         string input = Console.ReadLine();
         
         if (input.Length == 0)
         {
-            return (0,0);
+            return;
         }
 
         char firstSymbol = input[0];
 
-        if (firstSymbol == 'W' || firstSymbol == 'w')
+        (dx, dy) = firstSymbol switch
         {
-            dy = -1;
-        }
-        else if (firstSymbol == 'A' || firstSymbol == 'a')
-        {
-            dx = -1;
-        }
-        else if (firstSymbol == 'S' || firstSymbol == 's')
-        {
-            dy = 1;
-        }
-        else if (firstSymbol == 'D' || firstSymbol == 'd')
-        {
-            dx = 1;
-        }
-
-        return (dx, dy);
+            'W' or 'w' => (0, -1),
+            'A' or 'a' => (-1, 0),
+            'S' or 's' => (0, 1),
+            'D' or 'd' => (1, 0)
+        };
+        
 
     }
 
     public bool IsGameEnded()
     {
-        return isReachedFinish;
+        return isReachedFinish || oxygenLeft == 0;
     }
 
     private void CheckFinish()
@@ -131,6 +122,7 @@ public class Maze
         if (CanGoTo(x, y))
         {
             GoTo(x, y);
+            oxygenLeft--;
             return true;
         }
 
