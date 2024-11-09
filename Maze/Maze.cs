@@ -28,7 +28,7 @@ public class Maze
 
     public void RunGame()
     {
-        GenerateField();
+        GenerateMap();
         DrawMap();
 
         while (!IsGameEnded())
@@ -94,7 +94,16 @@ public class Maze
     {
         return isReachedFinish || oxygenLeft == 0;
     }
-
+    
+    public void Logic()
+    {
+        CheckJetpack();
+        
+        TryGoTo(dogX + dx, dogY + dy);
+        
+        CheckFinish();
+    }
+    
     private void CheckFinish()
     {
         if (dogX == finishX && dogY == finishY)
@@ -112,16 +121,18 @@ public class Maze
         }
     }
     
-    private bool IsWalkable(int x, int y)
-    {
-        return field[y, x] != '#';
-    }
+    private bool IsMovable(int x, int y) 
+        => field[y, x] != '#';
+
+    private bool IsOutsideMap(int x, int y)
+        => x < 0 || y < 0 || x >= width || y >= height;
+    
     
     private bool TryGoTo(int x, int y)
     {
         if (CanGoTo(x, y))
         {
-            GoTo(x, y);
+            MoveTo(x, y);
             oxygenLeft--;
             return true;
         }
@@ -131,11 +142,11 @@ public class Maze
     
     private bool CanGoTo(int x, int y)
     {
-        if (x < 0 || y < 0 || x >= width || y >= height)
+        if (IsOutsideMap(x,y))
         {
             return false;
         }
-        else if (!IsWalkable(x, y))
+        if (!IsMovable(x, y))
         {
             if (hasJetpack)
             {
@@ -145,27 +156,36 @@ public class Maze
         }
         return true;
     }
-
-    private void TryJumpOver(int x, int y)
-    {
-        bool hasMoved = TryGoTo(x + dx, y + dy);
-        hasJetpack = !hasMoved;
-    }
     
-    private void GoTo(int x, int y)
+    private void MoveTo(int x, int y)
     {
         dogX = x;
         dogY = y;
     }
     
-    public void Logic()
+    private void TryJumpOver(int x, int y)
     {
-        CheckJetpack();
+        int landingPositionX = x + dx;
+        int landingPositionY = y + dy;
         
-        TryGoTo(dogX + dx, dogY + dy);
-        
-        CheckFinish();
+        if (CanJumpOver(landingPositionX, landingPositionY))
+        { 
+            MoveTo(landingPositionX, landingPositionY);
+            hasJetpack = false;
+        }
     }
+
+    private bool CanJumpOver(int x, int y)
+    {
+        if (IsOutsideMap(x, y) || !IsMovable(x, y))
+        {
+            return false;
+        }
+
+        return true;
+
+    }
+    
     
     private void PlaceDog()
     {
