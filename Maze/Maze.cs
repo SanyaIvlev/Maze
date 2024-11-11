@@ -128,16 +128,20 @@ public class Maze
         => x < 0 || y < 0 || x >= width || y >= height;
     
     
-    private bool TryGoTo(int x, int y)
+    private void TryGoTo(int x, int y)
     {
         if (CanGoTo(x, y))
         {
             MoveTo(x, y);
             oxygenLeft--;
-            return true;
         }
-
-        return false;
+        else
+        {
+            if (hasJetpack)
+            {
+                TryJumpOver(x, y);
+            }
+        }
     }
     
     private bool CanGoTo(int x, int y)
@@ -148,10 +152,6 @@ public class Maze
         }
         if (!IsMovable(x, y))
         {
-            if (hasJetpack)
-            {
-                TryJumpOver(x, y);
-            }
             return false;
         }
         return true;
